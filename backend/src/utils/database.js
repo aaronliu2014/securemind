@@ -16,7 +16,7 @@ function createPostgresPool() {
       host: url.hostname,
       port: url.port || 5432,
       database: url.pathname.slice(1),
-      connectionTimeoutMillis: 5000,
+      connectionTimeoutMillis: 3000,
       // TencentDB and most cloud PostgreSQL require SSL
       ssl: { rejectUnauthorized: false },
       max: 20,
@@ -31,7 +31,7 @@ function createPostgresPool() {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT, 10) || 5432,
     database: process.env.DB_NAME || 'security_events',
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 3000,
     // Use SSL in production unless explicitly disabled
     ssl:
       process.env.DB_SSL === 'false'

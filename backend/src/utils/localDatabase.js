@@ -23,9 +23,11 @@ async function getDb() {
   if (existsSync(DB_PATH)) {
     const buffer = readFileSync(DB_PATH);
     db = new SQL.Database(buffer);
+    db.run('PRAGMA foreign_keys = ON');
     logger.info(`Loaded local database from ${DB_PATH}`);
   } else {
     db = new SQL.Database();
+    db.run('PRAGMA foreign_keys = ON');
     logger.info(`Created new local database at ${DB_PATH}`);
   }
   return db;
@@ -72,21 +74,24 @@ function convertSql(sql, params = []) {
 
 function convertPgSyntax(sql) {
   return sql
-    .replace(/SERIAL PRIMARY KEY/g, 'INTEGER PRIMARY KEY AUTOINCREMENT')
+    .replace(/SERIAL PRIMARY KEY/gi, 'INTEGER PRIMARY KEY AUTOINCREMENT')
+    .replace(/\bSERIAL\b/gi, 'INTEGER')
     .replace(/VARCHAR\(\d+\)/g, 'TEXT')
     .replace(/\bBOOLEAN\b/gi, 'INTEGER')
+    .replace(/\bFLOAT\b/gi, 'REAL')
     .replace(/TIMESTAMP DEFAULT CURRENT_TIMESTAMP/gi, "TEXT DEFAULT (datetime('now'))")
+    .replace(/TIMESTAMP WITH TIME ZONE/gi, 'TEXT')
     .replace(/\bTIMESTAMP\b(?!\s+DEFAULT)/gi, 'TEXT')
     .replace(/\bJSON\b/gi, 'TEXT')
     .replace(/\bJSONB\b/gi, 'TEXT')
-    .replace(/ILIKE/g, 'LIKE')
+    .replace(/ILIKE/gi, 'LIKE')
     .replace(/CURRENT_TIMESTAMP/gi, "datetime('now')")
     .replace(/NOW\(\)/gi, "datetime('now')")
     .replace(/TEXT\[\]/gi, 'TEXT')
     .replace(/INTEGER\[\]/gi, 'TEXT')
     .replace(/ON CONFLICT\s*\([^)]+\)\s*DO NOTHING/gi, '')
     .replace(/ON CONFLICT\s*\([^)]+\)\s*DO UPDATE SET[^)]*?(?=RETURNING|\s*$)/gi, '')
-    .replace(/RETURNING\s+\*?\s*(id,\s*)?(\w+(,\s*\w+)*)/gi, '')
+    .replace(/RETURNING\s+.+?(?=\s*$|;)/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
 }

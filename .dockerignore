@@ -1,0 +1,56 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node (installed at build time)
+**/node_modules
+**/npm-debug.log
+
+# Environment files (set via CloudBase console)
+**/.env
+**/.env.local
+**/.env.prod
+**/.env.production
+
+# Docs & markdown
+**/*.md
+**/README*
+
+# Tests
+**/test
+**/tests
+**/*.test.js
+**/*.spec.js
+**/coverage
+**/.nyc_output
+
+# Logs
+**/logs
+**/*.log
+
+# IDE
+.vscode
+.idea
+**/.DS_Store
+**/Thumbs.db
+
+# Docker compose (not needed for Cloud Run)
+docker-compose.yml
+docker-compose.prod.yml
+
+# Frontend (Cloud Run only needs backend)
+frontend
+nginx
+index.html
+static
+
+# Archives
+*.zip
+*.tar.gz
+
+# Railway config
+railway.json
+
+# CloudBase config (not needed in container)
+cloudbaserc.json
