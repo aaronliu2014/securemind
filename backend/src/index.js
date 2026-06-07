@@ -27,11 +27,23 @@ const isProduction = config.env === 'production';
 
 const allowedOrigins = isProduction
   ? [
-      process.env.FRONTEND_URL || 'https://aaronliu2014.github.io',
+      // Allow FRONTEND_URL from env var (set in CloudBase console)
+      ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+      // CloudBase static hosting domain
+      ...(process.env.TCB_STATIC_DOMAIN ? [`https://${process.env.TCB_STATIC_DOMAIN}`] : []),
+      // Legacy GitHub Pages domains
       'https://aaronliu2014.github.io',
       'https://aaronliu2014.github.io/security-event-platform',
-    ]
+      // Allow CloudBase Cloud Run default domain
+      ...(process.env.TCB_SERVICE_URL ? [`https://${process.env.TCB_SERVICE_URL}`] : []),
+    ].filter(Boolean)
   : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'];
+
+// Build CSP source list from configured origins
+const cspSources = [
+  "'self'",
+  ...allowedOrigins.filter(o => o.startsWith('https://')),
+];
 
 // Middleware
 app.use(helmet({
@@ -39,10 +51,10 @@ app.use(helmet({
     ? {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", 'https://aaronliu2014.github.io'],
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://aaronliu2014.github.io'],
+          scriptSrc: [...cspSources],
+          styleSrc: ["'self'", "'unsafe-inline'", ...cspSources],
           imgSrc: ["'self'", 'data:', 'https:'],
-          connectSrc: ["'self'", 'https://aaronliu2014.github.io'],
+          connectSrc: ["'self'", ...cspSources],
         },
       }
     : false,
@@ -149,8 +161,10 @@ process.on('unhandledRejection', (reason) => {
 const server = http.createServer(app);
 initWebSocket(server);
 
-const PORT = config.port;
-server.listen(PORT, async () => {
+// CloudBase Cloud Run injects PORT (typically 8080)
+const PORT = parseInt(process.env.PORT, 10) || config.port || 8080;
+
+server.listen(PORT, '0.0.0.0', async () => {
   logger.info(`Server running on port ${PORT} in ${config.env} mode`);
 
   // Initialize database tables
@@ -195,5 +209,30 @@ server.listen(PORT, async () => {
     logger.error(`Failed to initialize collection scheduler: ${error.message}`);
   }
 });
+
+// Graceful shutdown for CloudBase Cloud Run (handles SIGTERM)
+function gracefulShutdown(signal) {
+  logger.info(`${signal} received, shutting down gracefully...`);
+  server.close(async () => {
+    logger.info('HTTP server closed');
+    try {
+      const { default: pool } = await import('./utils/database.js');
+      await pool.end();
+      logger.info('Database connections closed');
+    } catch (err) {
+      logger.error(`Error closing database: ${err.message}`);
+    }
+    process.exit(0);
+  });
+
+  // Force shutdown after 30s
+  setTimeout(() => {
+    logger.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 30000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 export default app;

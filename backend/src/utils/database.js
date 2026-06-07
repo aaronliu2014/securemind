@@ -7,7 +7,7 @@ let _pool = null;
 let _initPromise = null;
 
 function createPostgresPool() {
-  // Railway provides DATABASE_URL for managed PostgreSQL
+  // CloudBase / Railway / TencentDB provides DATABASE_URL for managed PostgreSQL
   if (process.env.DATABASE_URL) {
     const url = new URL(process.env.DATABASE_URL);
     return new Pool({
@@ -16,18 +16,31 @@ function createPostgresPool() {
       host: url.hostname,
       port: url.port || 5432,
       database: url.pathname.slice(1),
-      connectionTimeoutMillis: 3000,
+      connectionTimeoutMillis: 5000,
+      // TencentDB and most cloud PostgreSQL require SSL
       ssl: { rejectUnauthorized: false },
+      max: 20,
+      idleTimeoutMillis: 30000,
     });
   }
 
+  // CloudBase Cloud Run: individual env vars (set via console or cloudbaserc.json)
   return new Pool({
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
+    port: parseInt(process.env.DB_PORT, 10) || 5432,
     database: process.env.DB_NAME || 'security_events',
-    connectionTimeoutMillis: 3000,
+    connectionTimeoutMillis: 5000,
+    // Use SSL in production unless explicitly disabled
+    ssl:
+      process.env.DB_SSL === 'false'
+        ? false
+        : process.env.NODE_ENV === 'production'
+          ? { rejectUnauthorized: false }
+          : false,
+    max: 20,
+    idleTimeoutMillis: 30000,
   });
 }
 

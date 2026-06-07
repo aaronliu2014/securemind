@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+// Priority: explicit REACT_APP_API_URL > CloudBase env > localhost default
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  (window.location.hostname !== 'localhost'
+    ? `${window.location.protocol}//${window.location.hostname}/api`
+    : 'http://localhost:3000/api');
 const API_TIMEOUT = process.env.NODE_ENV === 'production' ? 30000 : 10000;
 
 const apiClient = axios.create({

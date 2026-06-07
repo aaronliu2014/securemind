@@ -8,7 +8,11 @@ function connectWebSocket() {
   if (!token) return;
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = process.env.REACT_APP_WS_URL || `${protocol}//localhost:3000`;
+  const host =
+    process.env.REACT_APP_WS_URL ||
+    (window.location.hostname !== 'localhost'
+      ? `${protocol}//${window.location.hostname}`
+      : 'ws://localhost:3000');
 
   try {
     ws = new WebSocket(`${host}/ws?token=${token}`);

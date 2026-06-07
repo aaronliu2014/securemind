@@ -18,7 +18,7 @@
     "@testing-library/jest-dom": "^6.1.5",
     "eslint": "^8.54.0"
   },
-  "homepage": "https://aaronliu2014.github.io/security-event-platform",
+  "homepage": ".",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

@@ -1,0 +1,54 @@
+{
+  "version": "2.0",
+  "envId": "{{envId}}",
+  "framework": {
+    "name": "securemind",
+    "plugins": {
+      "container": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "securemind-backend",
+          "servicePath": "./backend",
+          "dockerfile": "Dockerfile",
+          "containerPort": 8080,
+          "envVariables": {
+            "NODE_ENV": "production",
+            "PORT": "8080",
+            "TZ": "Asia/Shanghai",
+            "DB_HOST": "{{env.DB_HOST}}",
+            "DB_PORT": "5432",
+            "DB_USER": "{{env.DB_USER}}",
+            "DB_PASSWORD": "{{env.DB_PASSWORD}}",
+            "DB_NAME": "{{env.DB_NAME}}",
+            "REDIS_HOST": "{{env.REDIS_HOST}}",
+            "REDIS_PORT": "6379",
+            "JWT_SECRET": "{{env.JWT_SECRET}}",
+            "SMTP_HOST": "{{env.SMTP_HOST}}",
+            "SMTP_PORT": "587",
+            "SMTP_USER": "{{env.SMTP_USER}}",
+            "SMTP_PASSWORD": "{{env.SMTP_PASSWORD}}",
+            "SMTP_FROM": "{{env.SMTP_FROM}}",
+            "COLLECTION_FREQUENCY": "early-morning",
+            "LOG_LEVEL": "info"
+          },
+          "cpu": 1,
+          "mem": 1,
+          "minNum": 1,
+          "maxNum": 5,
+          "policyType": "cpu",
+          "policyThreshold": 60,
+          "customLogs": "stdout",
+          "initialDelaySeconds": 10
+        }
+      },
+      "static": {
+        "use": "@cloudbase/framework-plugin-website",
+        "inputs": {
+          "buildCommand": "cd frontend && npm install && npm run build",
+          "outputPath": "./frontend/build",
+          "cloudPath": "/"
+        }
+      }
+    }
+  }
+}
