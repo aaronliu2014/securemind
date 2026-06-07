@@ -1,4 +1,4 @@
-# Security Event Platform
+# SecureMind
 
 **企业级安全事件监测与分析平台**
 
