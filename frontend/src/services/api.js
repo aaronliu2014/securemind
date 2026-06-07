@@ -1,12 +1,13 @@
 import axios from 'axios';
 
-// Priority: explicit REACT_APP_API_URL > CloudBase env > localhost default
+// REACT_APP_API_URL must be set at build time via --build-arg or .env
+// CloudBase static hosting domain ≠ Cloud Run backend domain, so auto-detect doesn't work
 const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
-  (window.location.hostname !== 'localhost'
-    ? `${window.location.protocol}//${window.location.hostname}/api`
-    : 'https://securityproject-267395-8-1440962365.sh.run.tcloudbase.com/api');
-const API_TIMEOUT = process.env.NODE_ENV === 'production' ? 30000 : 10000;
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000/api'
+    : `${window.location.protocol}//${window.location.hostname}/api`);
+const API_TIMEOUT = 30000;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

@@ -52,10 +52,10 @@ app.use(helmet({
     ? {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", 'https://aaronliu2014.github.io', 'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com'],
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://aaronliu2014.github.io', 'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com'],
+          scriptSrc: [...cspSources],
+          styleSrc: ["'self'", "'unsafe-inline'", ...cspSources],
           imgSrc: ["'self'", 'data:', 'https:'],
-          connectSrc: ["'self'", 'https://aaronliu2014.github.io', 'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com'],
+          connectSrc: ["'self'", ...cspSources],
         },
       }
     : false,

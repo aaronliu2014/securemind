@@ -44,7 +44,7 @@
       "static": {
         "use": "@cloudbase/framework-plugin-website",
         "inputs": {
-          "buildCommand": "cd frontend && npm install && npm run build",
+          "buildCommand": "cd frontend && npm install && REACT_APP_API_URL=https://securityproject-267395-8-1440962365.sh.run.tcloudbase.com/api npm run build",
           "outputPath": "./frontend/build",
           "cloudPath": "/"
         }
