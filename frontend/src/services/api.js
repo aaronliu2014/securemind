@@ -5,7 +5,7 @@ const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
   (window.location.hostname !== 'localhost'
     ? `${window.location.protocol}//${window.location.hostname}/api`
-    : 'http://localhost:3000/api');
+    : 'https://securityproject-267395-8-1440962365.sh.run.tcloudbase.com/api');
 const API_TIMEOUT = process.env.NODE_ENV === 'production' ? 30000 : 10000;
 
 const apiClient = axios.create({
