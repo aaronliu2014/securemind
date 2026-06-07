@@ -59,7 +59,7 @@ function AppLayout() {
   );
 }
 
-const routerBasename = process.env.NODE_ENV === 'production' ? '/security-event-platform' : undefined;
+const routerBasename = '/';
 
 function App() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
