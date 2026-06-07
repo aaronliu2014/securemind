@@ -34,6 +34,7 @@ const allowedOrigins = isProduction
       // Legacy GitHub Pages domains
       'https://aaronliu2014.github.io',
       'https://aaronliu2014.github.io/security-event-platform',
+      'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com',  // 添加这行
       // Allow CloudBase Cloud Run default domain
       ...(process.env.TCB_SERVICE_URL ? [`https://${process.env.TCB_SERVICE_URL}`] : []),
     ].filter(Boolean)
@@ -51,10 +52,10 @@ app.use(helmet({
     ? {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: [...cspSources],
-          styleSrc: ["'self'", "'unsafe-inline'", ...cspSources],
+          scriptSrc: ["'self'", 'https://aaronliu2014.github.io', 'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com'],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://aaronliu2014.github.io', 'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com'],
           imgSrc: ["'self'", 'data:', 'https:'],
-          connectSrc: ["'self'", ...cspSources],
+          connectSrc: ["'self'", 'https://aaronliu2014.github.io', 'https://security-event-prod-d6b714fe9d15-1440962365.tcloudbaseapp.com'],
         },
       }
     : false,
